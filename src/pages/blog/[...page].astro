@@ -15,32 +15,48 @@ export const postsPerPage = 12;
 
 // getStaticPaths()で動的なルートを設定
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
+    // 総記事数を取得
     const initialResponse = await getList({
         limit: 0,
         fields: ['id'],
     });
 
     const totalCount = initialResponse.totalCount;
+    const totalPages = Math.ceil(totalCount / postsPerPage);
 
-    // 50件ずつ分割して全記事を取得
-    const allContents = [];
-    const batchSize = 50; // 1回あたりの取得件数
-    const batchCount = Math.ceil(totalCount / batchSize);
+    // 必要最小限のページ数のみを静的生成（最初の3ページのみ）
+    const staticPageLimit = Math.min(3, totalPages);
+    const staticContents = [];
 
-    for (let i = 0; i < batchCount; i++) {
-        const batchResponse = await getList({
-            limit: batchSize,
-            offset: i * batchSize,
-            fields: ['id', 'title', 'description', 'thumbnail', 'publishedAt', 'createdAt'], //取得するフィールド
-            orders: '-publishedAt', //公開日順でソート
+    // 静的生成用のコンテンツのみ取得
+    if (staticPageLimit > 0) {
+        const staticResponse = await getList({
+            limit: postsPerPage * staticPageLimit,
+            fields: ['id', 'title', 'description', 'thumbnail', 'publishedAt', 'createdAt'],
+            orders: '-publishedAt',
         });
-        allContents.push(...batchResponse.contents);
+        staticContents.push(...staticResponse.contents);
     }
 
-    // 取得した全記事に対してページネーションを適用
-    return paginate(allContents, {
+    // 残りのページ用のプレースホルダーを作成
+    const remainingPages = totalPages - staticPageLimit;
+    if (remainingPages > 0) {
+        // 空のコンテンツでページ構造のみ作成
+        for (let i = 0; i < remainingPages * postsPerPage; i++) {
+            staticContents.push({
+                id: `placeholder-${i}`,
+                title: '',
+                description: '',
+                thumbnail: null,
+                publishedAt: '',
+                createdAt: ''
+            });
+        }
+    }
+
+    return paginate(staticContents, {
         pageSize: postsPerPage,
-        params: { page: undefined }, // 1ページ目のパスパラメータをundefinedに設定
+        params: { page: undefined },
     });
 }
 
@@ -86,7 +102,7 @@ if (page.currentPage === 1 && Astro.params.page === '1') {
                 margin: auto;
                 opacity: 0;
                 filter: blur(12px) saturate(180%);
-                will-change: filter;
+                transform: translateZ(0);
                 z-index: -1;
                 animation: fadeIn 500ms cubic-bezier(0.33, 1, 0.68, 1) 180ms forwards;
             }
@@ -179,6 +195,7 @@ if (page.currentPage === 1 && Astro.params.page === '1') {
                                                     srcset={`${post.thumbnail?.url}?fit=crop&w=391&h=205 1x, ${post.thumbnail?.url}?fit=crop&w=391&h=205&dpr=2 2x`}
                                                     alt=""
                                                     decoding="async"
+                                                    loading={index <= 4 ? 'eager' : 'lazy'}
                                                     transition:name={`BlogMV-${post.id}`}
                                                     fetchpriority={index <= 4 ? 'high' : 'auto'}
                                                 />
