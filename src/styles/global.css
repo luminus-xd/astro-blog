@@ -73,7 +73,9 @@
     display: block;
 }
 
-* {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     padding: 0;
     margin: 0;
@@ -86,6 +88,10 @@ html {
     line-break: strict;
     scrollbar-gutter: stable;
     font-feature-settings: normal;
+    text-spacing-trim: trim-start;
+    text-autospace: normal;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 html,
@@ -103,6 +109,9 @@ body {
     line-height: 1.7;
     font-size: 1.58rem;
     transition: background-color 400ms var(--easing-normal);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 main {
@@ -146,6 +155,8 @@ p {
 code {
     font-family: var(--font-family-primary);
     color: var(--color-code-text);
+    font-style: unset;
+    font-weight: 400;
 }
 
 a {
