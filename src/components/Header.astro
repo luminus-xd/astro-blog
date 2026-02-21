@@ -17,17 +17,20 @@ const myIcon = 'https://images.microcms-assets.io/assets/086f9d42ce494f47b9788ee
                 <span>{SITE_TITLE}</span>
             </a>
         </h2>
-        <div class="internal-links">
-            <HeaderLink href="/">Home</HeaderLink>
-            <HeaderLink href="/blog/">Blog</HeaderLink>
-            <HeaderLink href="/about">About</HeaderLink>
-        </div>
+        <ul class="internal-links">
+            <li>
+                <HeaderLink href="/blog/">Blog</HeaderLink>
+            </li>
+            <li>
+                <HeaderLink href="/about">About</HeaderLink>
+            </li>
+        </ul>
     </nav>
 </header>
 <style>
     header {
         margin: 0;
-        padding: 0 0 0 1em;
+        padding: 0;
         box-shadow: 0 2px 8px rgba(var(--black), 5%);
     }
     h2 {
@@ -39,10 +42,8 @@ const myIcon = 'https://images.microcms-assets.io/assets/086f9d42ce494f47b9788ee
         grid-template-columns: auto auto;
         align-items: center;
         gap: 12px;
-        margin-left: -0.5em;
     }
-    h2 a,
-    h2 a.active {
+    h2 a {
         text-decoration: none;
     }
     h2 img {
@@ -82,20 +83,7 @@ const myIcon = 'https://images.microcms-assets.io/assets/086f9d42ce494f47b9788ee
         }
     }
     .internal-links {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
+        display: flex;
+        margin-right: 0.5em;
     }
-    @media (max-width: 720px) {
-        nav a {
-            padding: 1em 0.5em;
-        }
-        .internal-links {
-            position: absolute;
-            left: auto;
-            right: 0.6em;
-            transform: translateX(0);
-        }
-    }
-
 </style>
